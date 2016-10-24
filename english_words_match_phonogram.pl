@@ -5,12 +5,15 @@ use warnings;
 
 use LWP::UserAgent;
 use HTML::TreeBuilder;
+use Encode;
 
+$|++;
 my $ua = LWP::UserAgent->new;
 
 while ( my $word = <DATA> ) {
     chomp( $word );
     my ( $en, $cn ) = split /\s+/, $word, 2;
+    $cn = encode( 'utf8', decode( 'utf8', $cn));
 
     my $res = $ua->get( sprintf( 'http://www.iciba.com/%s', $en ) );
     my $t = HTML::TreeBuilder->new_from_content( $res->content );
@@ -26,6 +29,8 @@ while ( my $word = <DATA> ) {
     }else {
         printf( "%s %s\n", $en, $cn );
     }
+    
+    $t = $t->delete;
 }
 
 
